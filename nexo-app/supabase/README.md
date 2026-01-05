@@ -4,9 +4,15 @@ This directory contains all the database schema, policies, and seed data for the
 
 ## Files Overview
 
-- **schema.sql** - Complete database schema with tables, indexes, functions, and views
-- **rls-policies.sql** - Row Level Security policies for multi-tenant data isolation
+### Core Files (in execution order)
+1. **schema.sql** - Complete database schema with tables, indexes, functions, and views
+2. **rls-policies.sql** - Row Level Security policies for multi-tenant data isolation
+3. **fix-trigger-improved.sql** - Database trigger to auto-create user on signup (SECURITY DEFINER)
+4. **onboarding-function.sql** - RPC function for onboarding (bypasses RLS safely)
+
+### Optional Files
 - **seed.sql** - Sample data for development and testing
+- **auth-user-trigger.sql** - Original trigger (replaced by fix-trigger-improved.sql)
 
 ## Setup Instructions
 
@@ -77,13 +83,26 @@ You have two options to run the SQL files:
    supabase db push --file supabase/seed.sql
    ```
 
-### 5. Enable Email Auth (Optional but Recommended)
+### 5. Run Authentication Scripts (Required for signup/onboarding)
 
-1. Go to **Authentication** > **Providers**
-2. Enable **Email** provider
-3. Configure email templates if needed
+Execute these in order via the SQL Editor:
 
-### 6. Generate TypeScript Types
+1. **fix-trigger-improved.sql** - Creates the trigger that auto-creates users in `public.users` when they sign up via Supabase Auth. Uses `SECURITY DEFINER` to bypass RLS.
+
+2. **onboarding-function.sql** - Creates the `complete_onboarding()` function that:
+   - Creates the business
+   - Updates the user with the business_id
+   - All in one transaction with `SECURITY DEFINER`
+   - Also modifies users table to allow `business_id NULL` during signup
+
+### 6. Disable Email Confirmation (For Development)
+
+1. Go to **Authentication** > **Email Templates**
+2. Or in **Authentication** > **Providers** > **Email**
+3. Disable "Confirm email" for easier development
+4. In production, enable and configure proper email templates
+
+### 7. Generate TypeScript Types
 
 After running the schema, generate TypeScript types:
 

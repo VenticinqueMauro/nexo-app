@@ -87,6 +87,139 @@
 
 ---
 
+## 📅 Sesión 2 - 5 de Enero 2026
+
+### ✅ Completado
+
+#### 1. Sistema de Autenticación Completo
+- ✅ **Páginas de autenticación creadas**:
+  - `app/(auth)/login/page.tsx` - Página de inicio de sesión
+  - `app/(auth)/signup/page.tsx` - Página de registro
+  - `app/(auth)/layout.tsx` - Layout compartido para auth con diseño split-screen
+
+- ✅ **Server Actions** (`actions/auth.ts`):
+  - `loginAction()` - Autenticación con Supabase y verificación de onboarding
+  - `signupAction()` - Registro de usuario y creación en tabla `users`
+  - `completeOnboardingAction()` - Creación de negocio y actualización de usuario
+  - `logoutAction()` - Cierre de sesión
+
+- ✅ **Características**:
+  - Validación de formularios
+  - Estados de carga (loading states)
+  - Mensajes de error claros
+  - Redirecciones automáticas basadas en estado
+  - Manejo de sesiones con Supabase Auth
+
+#### 2. Flow de Onboarding
+- ✅ **Página de onboarding** (`app/(auth)/onboarding/page.tsx`):
+  - Flow multi-paso (2 pasos)
+  - **Paso 1**: Selección de industria (Distribuidora, Retail, Almacén, Servicios)
+  - **Paso 2**: Configuración del negocio (nombre, teléfono, dirección)
+  - Indicador de progreso visual
+  - Configuración automática de módulos según industria seleccionada
+
+#### 3. Dashboard con Navegación
+- ✅ **Layout del dashboard** (`app/(dashboard)/layout.tsx`):
+  - Verificación de autenticación
+  - Redirección si no completó onboarding
+  - Integración con componentes de sidebar
+
+- ✅ **Sidebar navegacional** (`components/dashboard/sidebar.tsx`):
+  - Navegación adaptativa según módulos habilitados
+  - Muestra información del negocio y usuario
+  - Items: Inicio, Productos, Clientes, Pedidos, Entregas*, Cobros, Ajustes
+  - Opción de cerrar sesión
+  - (*Entregas solo si está habilitado en config del negocio)
+
+- ✅ **Header del dashboard** (`components/dashboard/header.tsx`):
+  - Toggle de sidebar
+  - Barra de búsqueda (UI, funcionalidad pendiente)
+  - Botón de notificaciones
+
+- ✅ **Dashboard home** (`app/(dashboard)/dashboard/page.tsx`):
+  - Mensaje de bienvenida personalizado
+  - Tarjetas de métricas (Productos, Clientes, Pedidos, Facturación)
+  - Sección "Comienza a usar Nexo" con checklist
+  - Placeholders para próximas features
+
+#### 4. Diseño y UX
+- ✅ **Componentes de shadcn/ui instalados**:
+  - button, card, input, label, form, select, sidebar, alert, separator
+
+- ✅ **Animaciones y transiciones**:
+  - Keyframes personalizados (slide-up, slide-in-right, fade-in, scale-in)
+  - Delays escalonados para efectos de entrada
+  - Transiciones suaves en hover y focus
+
+- ✅ **Diseño distintivo**:
+  - Estilo "Modern Editorial Business"
+  - Layout split-screen para auth pages
+  - Palette de colores profesional (primario: naranja, acentos visuales)
+  - Tipografía: Geist (body) con jerarquía clara
+  - Mobile-first responsive
+
+#### 5. Página de Inicio con Redirección Inteligente
+- ✅ **Root page** (`app/page.tsx`):
+  - Verifica estado de autenticación
+  - Redirige a `/login` si no autenticado
+  - Redirige a `/onboarding` si no completó setup
+  - Redirige a `/dashboard` si todo está listo
+
+#### 6. Solución de Issues Técnicos
+- ✅ **TypeScript type issues**:
+  - Agregados type annotations a queries de Supabase
+  - Uso de `@ts-ignore` para mitigación temporal (tipos de DB pendientes de generar)
+  - Build exitoso sin errores
+
+---
+
+## 📅 Sesión 3 - 5 de Enero 2026
+
+### ✅ Completado
+
+#### 1. Sistema de Notificaciones Toast
+- ✅ **Sonner integrado** para notificaciones toast
+- ✅ Componente `Toaster` agregado al layout raíz
+- ✅ Mensajes de error y éxito claros para el usuario
+- ✅ Posición: top-right con estilo richColors
+
+#### 2. Mejoras de UX en Autenticación
+- ✅ **Componente PasswordInput** (`components/ui/password-input.tsx`):
+  - Toggle de visibilidad con icono Eye/EyeOff
+  - Integrado en login, signup y confirmación de password
+- ✅ **Feedback visual mejorado**:
+  - Toast notifications en lugar de Alert components
+  - Estados de carga claros
+
+#### 3. Solución de RLS para Signup y Onboarding
+- ✅ **Database Trigger para auto-crear usuarios** (`supabase/fix-trigger-improved.sql`):
+  - Trigger `on_auth_user_created` en `auth.users`
+  - Función `handle_new_user()` con SECURITY DEFINER
+  - Bypasea RLS de forma segura
+  - Extrae nombre de metadata o usa email como fallback
+  - ON CONFLICT DO NOTHING para evitar duplicados
+
+- ✅ **Función RPC para Onboarding** (`supabase/onboarding-function.sql`):
+  - Función `complete_onboarding()` con SECURITY DEFINER
+  - Crea negocio y actualiza usuario en una transacción
+  - Bypasea RLS de forma segura
+  - Valida que usuario no tenga business_id previo
+  - Modifica tabla users para permitir `business_id NULL`
+
+- ✅ **Server Action actualizado** (`actions/auth.ts`):
+  - `completeOnboardingAction` usa RPC en lugar de inserts directos
+  - Manejo de errores específicos (ya tiene negocio, no autenticado, etc.)
+  - Phone y address guardados en `config.contact` (JSONB)
+
+#### 4. Limpieza y Consolidación
+- ✅ **Archivos SQL redundantes eliminados**:
+  - Removidos: fix-rls-signup.sql, fix-rls-signup-v2.sql, fix-businesses-rls.sql, fix-businesses-rls-v2.sql, diagnose-trigger.sql, diagnose-businesses-rls.sql
+- ✅ **README de Supabase actualizado** con orden correcto de scripts
+- ✅ **Flujo completo probado y funcionando**:
+  - Signup → Trigger crea usuario → Onboarding → RPC crea negocio → Dashboard
+
+---
+
 ## 🚧 En Progreso
 
 Ninguna tarea en progreso actualmente.
@@ -95,26 +228,26 @@ Ninguna tarea en progreso actualmente.
 
 ## 📋 Próximos Pasos (Roadmap)
 
-### Fase 2: MVP Core - Sistema de Autenticación
-- [ ] Implementar Supabase Auth
-  - [ ] Página de Login (`/login`)
-  - [ ] Página de Signup (`/signup`)
-  - [ ] Lógica de autenticación con Supabase
-  - [ ] Redirección después de login
-  - [ ] Manejo de sesiones
-  - [ ] Logout
+### Fase 2: MVP Core - Sistema de Autenticación ✅ COMPLETADO
+- ✅ Implementar Supabase Auth
+  - ✅ Página de Login (`/login`)
+  - ✅ Página de Signup (`/signup`)
+  - ✅ Lógica de autenticación con Supabase
+  - ✅ Redirección después de login
+  - ✅ Manejo de sesiones
+  - ✅ Logout
 
-### Fase 2: MVP Core - Onboarding
-- [ ] Flow de onboarding para nuevos usuarios
-  - [ ] Selección de tipo de industria
-  - [ ] Configuración inicial del negocio
-  - [ ] Creación del primer usuario owner
-  - [ ] Inserción en tabla `users` con `business_id`
+### Fase 2: MVP Core - Onboarding ✅ COMPLETADO
+- ✅ Flow de onboarding para nuevos usuarios
+  - ✅ Selección de tipo de industria
+  - ✅ Configuración inicial del negocio
+  - ✅ Creación del primer usuario owner
+  - ✅ Inserción en tabla `users` con `business_id`
 
-### Fase 2: MVP Core - Dashboard
-- [ ] Layout principal con navegación
-- [ ] Dashboard home con métricas básicas
-- [ ] Sidebar con navegación por módulos
+### Fase 2: MVP Core - Dashboard ✅ COMPLETADO
+- ✅ Layout principal con navegación
+- ✅ Dashboard home con métricas básicas
+- ✅ Sidebar con navegación por módulos
 
 ### Fase 2: MVP Core - Gestión de Productos
 - [ ] CRUD de productos
@@ -175,6 +308,36 @@ Ninguna tarea en progreso actualmente.
    - Solución: Renombrar archivo y función de `middleware` a `proxy`
    - Commit: 66fe204
 
+4. ✅ **TypeScript type errors en queries de Supabase**
+   - Descripción: Tipos de Supabase no generados, causando errores `never` en inserts/updates
+   - Solución temporal: Uso de `@ts-ignore` y type annotations explícitas
+   - Acción futura: Generar tipos reales con `npx supabase gen types typescript`
+   - Sesión: 2 (5 Enero 2026)
+
+5. ✅ **RLS bloqueando signup de usuarios**
+   - Descripción: Las políticas RLS impedían crear usuarios durante signup
+   - Solución: Database trigger con SECURITY DEFINER que bypasea RLS
+   - Archivo: `supabase/fix-trigger-improved.sql`
+   - Sesión: 3 (5 Enero 2026)
+
+6. ✅ **RLS bloqueando creación de negocios en onboarding**
+   - Descripción: Las políticas RLS impedían crear negocios durante onboarding
+   - Solución: Función RPC `complete_onboarding()` con SECURITY DEFINER
+   - Archivo: `supabase/onboarding-function.sql`
+   - Sesión: 3 (5 Enero 2026)
+
+7. ✅ **Columna business_id NOT NULL bloqueando signup**
+   - Descripción: La tabla `users` tenía `business_id NOT NULL` pero los usuarios nuevos no tienen negocio aún
+   - Solución: `ALTER TABLE users ALTER COLUMN business_id DROP NOT NULL`
+   - Archivo: `supabase/onboarding-function.sql`
+   - Sesión: 3 (5 Enero 2026)
+
+8. ✅ **Columna full_name vs name**
+   - Descripción: El código usaba `full_name` pero la tabla tiene `name`
+   - Solución: Cambiar todas las referencias a `name`
+   - Archivos: actions/auth.ts, components/dashboard/*
+   - Sesión: 3 (5 Enero 2026)
+
 ### Pendientes
 Ninguno.
 
@@ -230,21 +393,50 @@ Ninguno.
 - Mejor DX con layouts anidados
 - Es el futuro de Next.js
 
+### 6. SECURITY DEFINER para Operaciones de Auth/Onboarding
+**Decisión:** Usar funciones PostgreSQL con SECURITY DEFINER para operaciones que necesitan bypasear RLS.
+
+**Razones:**
+- Es el patrón recomendado por Supabase
+- Mantiene RLS activo para todas las demás operaciones
+- Bypass controlado y seguro solo donde es necesario
+- Las funciones validan permisos internamente
+- Evita crear políticas RLS complejas para edge cases
+
+**Aplicado en:**
+- `handle_new_user()` - Trigger de signup
+- `complete_onboarding()` - RPC de onboarding
+
 ---
 
 ## 🎯 Objetivos de la Próxima Sesión
 
 **Prioridad Alta:**
-1. Implementar sistema de autenticación (Login/Signup)
-2. Crear flow de onboarding para nuevos usuarios
-3. Dashboard básico con navegación
+1. CRUD de productos completo
+   - Listar productos con tabla interactiva
+   - Crear producto (con/sin variantes según industria)
+   - Editar producto
+   - Eliminar producto (soft delete)
+   - Vista de productos con stock
+
+2. CRUD de clientes
+   - Listar clientes
+   - Crear cliente
+   - Editar cliente
+   - Vista de detalles con historial
 
 **Prioridad Media:**
-4. CRUD de productos básico
-5. Layout principal de la aplicación
+3. Gestión de pedidos/ventas básica
+   - Crear pedido/venta
+   - Listar pedidos
+   - Ver detalle de pedido
+
+4. Generar tipos de TypeScript desde Supabase
+   - Ejecutar `npx supabase gen types typescript`
+   - Remover `@ts-ignore` temporales
 
 **Prioridad Baja:**
-6. Landing page pública
+5. Landing page pública con catálogo
 
 ---
 
@@ -281,6 +473,6 @@ Ninguno.
 
 ---
 
-**Última actualización:** 5 de Enero 2026
-**Versión del proyecto:** 0.1.0
-**Commit actual:** 66fe204
+**Última actualización:** 5 de Enero 2026 (Sesión 3)
+**Versión del proyecto:** 0.2.0
+**Estado:** Auth y Onboarding completos y funcionando
