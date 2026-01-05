@@ -1,36 +1,191 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nexo
 
-## Getting Started
+> Sistema inteligente de gestión comercial multi-industria
 
-First, run the development server:
+Nexo es un asistente inteligente que gestiona negocios comerciales de forma autónoma. No es un panel de control tradicional donde el usuario debe buscar, clickear y cargar datos manualmente. Es un sistema que **trabaja solo**, entiende el negocio, anticipa problemas y ejecuta tareas con mínima intervención humana.
+
+## Características Principales
+
+- **Conversacional**: Se usa hablando, no clickeando
+- **Proactivo**: Avisa antes de que haya problemas
+- **Multi-industria**: Funciona para distribuidoras, retail, almacenes y servicios
+- **Multi-tenant**: Arquitectura SaaS lista para escalar
+- **Seguro**: Row Level Security con aislamiento completo de datos
+
+## Stack Tecnológico
+
+- **Frontend**: Next.js 16 (App Router) + React 19
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth
+- **Bot**: Telegram (planned)
+- **LLM**: Arquitectura híbrida (planned)
+
+## Inicio Rápido
+
+### Prerrequisitos
+
+- Node.js 20+ instalado
+- Una cuenta en [Supabase](https://supabase.com)
+
+### Instalación
+
+1. Clonar el repositorio e instalar dependencias:
+
+```bash
+npm install
+```
+
+2. Configurar variables de entorno:
+
+```bash
+cp .env.example .env.local
+```
+
+Editar `.env.local` con tus credenciales de Supabase.
+
+3. Configurar la base de datos:
+
+Ver las instrucciones detalladas en [`supabase/README.md`](./supabase/README.md)
+
+4. Iniciar el servidor de desarrollo:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000) en tu navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estructura del Proyecto
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+nexo-app/
+├── app/                    # Next.js App Router
+│   ├── layout.tsx         # Layout raíz
+│   ├── page.tsx           # Página principal
+│   └── globals.css        # Estilos globales
+├── components/            # Componentes React
+│   └── ui/               # shadcn/ui components
+├── lib/                  # Utilidades y configuraciones
+│   ├── supabase/        # Clientes de Supabase
+│   │   ├── client.ts    # Cliente para componentes de cliente
+│   │   ├── server.ts    # Cliente para componentes de servidor
+│   │   └── middleware.ts # Cliente para middleware
+│   └── utils.ts         # Utilidades generales (cn, etc.)
+├── types/               # TypeScript types
+│   └── database.types.ts # Tipos de la base de datos
+├── supabase/           # Database migrations y seed
+│   ├── schema.sql      # Esquema de la base de datos
+│   ├── rls-policies.sql # Row Level Security policies
+│   ├── seed.sql        # Datos de prueba
+│   └── README.md       # Documentación de la base de datos
+├── proxy.ts           # Next.js proxy (auth refresh middleware)
+├── CLAUDE.md          # Instrucciones para Claude Code
+└── nexo-app.md        # Documento de especificación completa
+```
 
-## Learn More
+## Comandos Disponibles
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev      # Iniciar servidor de desarrollo
+npm run build    # Build para producción
+npm run start    # Iniciar servidor de producción
+npm run lint     # Ejecutar ESLint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Agregar Componentes shadcn/ui
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npx shadcn@latest add <component-name>
+```
 
-## Deploy on Vercel
+Los componentes se instalan en `components/ui/` usando el estilo "new-york" con iconos lucide-react.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Roadmap de Desarrollo
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### ✅ Fase 1: Setup (Completado)
+- [x] Configuración de Next.js + Supabase
+- [x] Modelo de datos multi-tenant
+- [x] Row Level Security policies
+- [x] Clientes de Supabase para Next.js
+
+### 🚧 Fase 2: MVP Core (En Progreso)
+- [ ] Sistema de autenticación
+- [ ] Onboarding por tipo de industria
+- [ ] CRUD de productos (con/sin variantes)
+- [ ] CRUD de clientes
+- [ ] Gestión de pedidos/ventas
+- [ ] Landing pública con catálogo
+
+### 📋 Fase 3: Agente Conversacional
+- [ ] Integración con LLM
+- [ ] Bot de Telegram
+- [ ] Clasificador de intenciones
+- [ ] Carga de pedidos por chat
+- [ ] Consultas por chat
+
+### 📋 Fase 4: Automatización
+- [ ] Resúmenes automáticos
+- [ ] Alertas de stock bajo
+- [ ] Recordatorios de deuda
+- [ ] Detección de anomalías
+- [ ] Gestión de entregas
+
+## Arquitectura Multi-Tenant
+
+Nexo usa una arquitectura multi-tenant donde:
+
+- Todos los datos están particionados por `business_id`
+- Row Level Security (RLS) garantiza aislamiento total de datos
+- Cada usuario pertenece a un negocio
+- Los usuarios solo pueden acceder a datos de su negocio
+
+### Roles de Usuario
+
+| Rol | Permisos |
+|-----|----------|
+| **owner** | Acceso completo a todo |
+| **seller** | Gestión de clientes, pedidos y cobros |
+| **warehouse** | Gestión de stock y productos |
+| **driver** | Solo sus entregas asignadas |
+
+## Módulos por Industria
+
+Cada negocio activa los módulos que necesita:
+
+### Distribuidora
+- Stock (sin variantes, con proyecciones)
+- Pedidos recurrentes
+- Precios escalonados
+- Entregas con rutas propias
+- Cuenta corriente
+
+### Retail / Tienda
+- Stock con variantes (talla, color)
+- Ventas
+- Cuenta corriente
+- Sin entregas (retiro en local)
+
+### Almacén / Kiosco
+- Stock simple
+- Ventas rápidas
+- Cuenta corriente básica
+
+## Documentación
+
+- Ver [`nexo-app.md`](./nexo-app.md) para la especificación completa del sistema
+- Ver [`supabase/README.md`](./supabase/README.md) para la documentación de la base de datos
+- Ver [`CLAUDE.md`](./CLAUDE.md) para instrucciones de desarrollo
+
+## Contribuir
+
+Este es un proyecto en desarrollo activo. Ver el roadmap arriba para conocer las prioridades actuales.
+
+## Licencia
+
+Privado - Todos los derechos reservados
+
+---
+
+**Nexo** - El futuro son los agentes.
