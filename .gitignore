@@ -1,0 +1,4 @@
+# Ignore all directories except nexo-app
+/*
+!/nexo-app/
+!.gitignore
