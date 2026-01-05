@@ -95,7 +95,11 @@ Instrucciones para Claude Code al trabajar en este repositorio.
 - **Styling**: `cn()` utility from `lib/utils.ts` para classes
 - **Multi-tenant**: Todas las queries filtran por `business_id`
 - **RLS**: Row Level Security habilitado en todas las tablas
-- **Modular**: Módulos se activan/desactivan por industria
+- **Modular**: Modulos se activan/desactivan por industria
+- **Tipos centralizados**: `types/app.types.ts` para Business, User, Config, etc.
+- **Constantes**: `lib/config.ts` para VALIDATION, UI breakpoints, industrias
+- **Logger**: `lib/logger.ts` en lugar de console.error
+- **Industrias**: `lib/industries.ts` para nombres y definiciones
 
 ### Estructura de Directorios
 
@@ -104,20 +108,27 @@ nexo-app/
 ├── app/                    # Next.js App Router
 │   ├── (auth)/            # Grupo de rutas de auth
 │   ├── (dashboard)/       # Grupo de rutas protegidas
-│   ├── layout.tsx         # Layout raíz
-│   ├── page.tsx           # Página principal
+│   ├── layout.tsx         # Layout raiz
+│   ├── page.tsx           # Pagina principal
 │   └── globals.css        # Estilos globales
 ├── components/            # Componentes React
+│   ├── dashboard/        # Componentes del dashboard
 │   └── ui/               # shadcn/ui components
 ├── lib/                  # Utilidades y configuraciones
 │   ├── supabase/        # Clientes de Supabase
+│   ├── config.ts        # Constantes (VALIDATION, UI, industrias)
+│   ├── industries.ts    # Definiciones de industrias
+│   ├── logger.ts        # Sistema de logging
 │   └── utils.ts         # Utilidades (cn, etc.)
 ├── types/               # TypeScript types
-│   └── database.types.ts # Tipos de Supabase
-├── supabase/           # SQL migrations
-├── scripts/            # Scripts de utilidad
+│   ├── app.types.ts     # Tipos de la app (Business, User, etc.)
+│   └── database.types.ts # Tipos de Supabase (pendiente generar)
 ├── hooks/              # Custom React hooks
-└── actions/            # Server Actions
+│   ├── use-mobile.ts   # Hook para detectar mobile
+│   └── use-user.tsx    # UserProvider + useUser hook
+├── actions/            # Server Actions
+├── supabase/           # SQL migrations
+└── scripts/            # Scripts de utilidad
 ```
 
 ---
@@ -390,5 +401,5 @@ Esto verifica:
 
 ---
 
-**Última actualización:** 5 de Enero 2026
-**Versión:** 1.1.0
+**Ultima actualizacion:** 5 de Enero 2026
+**Version:** 1.2.0

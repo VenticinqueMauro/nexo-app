@@ -8,61 +8,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
-  Truck,
-  Store,
-  ShoppingBag,
-  Wrench,
   ArrowRight,
   ArrowLeft,
   Loader2,
   CheckCircle2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-type Industry = 'distributor' | 'retail' | 'grocery' | 'service'
-
-const industries = [
-  {
-    id: 'distributor' as Industry,
-    name: 'Distribuidora',
-    description: 'Bebidas, alimentos, productos mayoristas',
-    icon: Truck,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10 hover:bg-blue-500/20',
-    borderColor: 'border-blue-500',
-  },
-  {
-    id: 'retail' as Industry,
-    name: 'Tienda / Retail',
-    description: 'Ropa, accesorios, productos al por menor',
-    icon: Store,
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-500/10 hover:bg-purple-500/20',
-    borderColor: 'border-purple-500',
-  },
-  {
-    id: 'grocery' as Industry,
-    name: 'Almacén / Kiosco',
-    description: 'Comercio de barrio, productos variados',
-    icon: ShoppingBag,
-    color: 'text-green-500',
-    bgColor: 'bg-green-500/10 hover:bg-green-500/20',
-    borderColor: 'border-green-500',
-  },
-  {
-    id: 'service' as Industry,
-    name: 'Servicios',
-    description: 'Lavandería, taller, servicios profesionales',
-    icon: Wrench,
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-500/10 hover:bg-orange-500/20',
-    borderColor: 'border-orange-500',
-  },
-]
+import { INDUSTRIES } from '@/lib/industries'
+import type { IndustryType } from '@/types/app.types'
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1)
-  const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null)
+  const [selectedIndustry, setSelectedIndustry] = useState<IndustryType | null>(null)
   const [state, formAction] = useActionState<ActionState | null, FormData>(
     completeOnboardingAction,
     null
@@ -76,7 +33,7 @@ export default function OnboardingPage() {
     }
   }, [state])
 
-  const selectedIndustryData = industries.find((i) => i.id === selectedIndustry)
+  const selectedIndustryData = INDUSTRIES.find((i) => i.id === selectedIndustry)
 
   return (
     <div className="w-full max-w-3xl mx-auto">
@@ -115,7 +72,7 @@ export default function OnboardingPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            {industries.map((industry, index) => {
+            {INDUSTRIES.map((industry, index) => {
               const Icon = industry.icon
               const isSelected = selectedIndustry === industry.id
               return (

@@ -4,19 +4,9 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Bell, Search } from 'lucide-react'
+import type { UserWithBusiness } from '@/types/app.types'
 
-type UserData = {
-  id: string
-  name: string
-  email: string
-  role: string
-  business: {
-    name: string
-    industry: string
-  }
-}
-
-export function DashboardHeader({ user }: { user: UserData }) {
+export function DashboardHeader({ user }: { user: UserWithBusiness }) {
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
       <SidebarTrigger className="-ml-1" />

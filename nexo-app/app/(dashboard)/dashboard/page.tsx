@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, Users, ShoppingCart, DollarSign, TrendingUp, AlertCircle } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import type { Business, MetricTrend } from '@/types/app.types'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -18,7 +20,7 @@ export default async function DashboardPage() {
     .from('users')
     .select('*, business:businesses(*)')
     .eq('id', user.id)
-    .single<{ business_id: string; business: any; name: string }>()
+    .single<{ business_id: string; business: Business | null; name: string }>()
 
   // Get basic metrics (these will return 0 for now as there's no data yet)
   const { count: productsCount } = await supabase
@@ -164,8 +166,8 @@ function MetricCard({
   title: string
   value: string | number
   description: string
-  icon: any
-  trend: { value: number; isPositive: boolean } | null
+  icon: LucideIcon
+  trend: MetricTrend | null
   color: string
   bgColor: string
 }) {

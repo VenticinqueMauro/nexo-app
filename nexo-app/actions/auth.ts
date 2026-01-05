@@ -3,6 +3,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { createLogger } from '@/lib/logger'
+import { VALIDATION, isValidIndustry, getDefaultConfig } from '@/lib/config'
+import type { IndustryType } from '@/types/app.types'
+
+const log = createLogger('auth')
 
 export type ActionState = {
   error?: string
@@ -60,7 +65,7 @@ export async function loginAction(
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error
     }
-    console.error('Login error:', error)
+    log.error('Login failed', error, { action: 'login' })
     return { error: 'Error inesperado al iniciar sesión' }
   }
 }
@@ -83,8 +88,8 @@ export async function signupAction(
     return { error: 'Las contraseñas no coinciden' }
   }
 
-  if (password.length < 8) {
-    return { error: 'La contraseña debe tener al menos 8 caracteres' }
+  if (password.length < VALIDATION.PASSWORD_MIN_LENGTH) {
+    return { error: `La contrasena debe tener al menos ${VALIDATION.PASSWORD_MIN_LENGTH} caracteres` }
   }
 
   try {
@@ -134,7 +139,7 @@ export async function signupAction(
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error
     }
-    console.error('Signup error:', error)
+    log.error('Signup failed', error, { action: 'signup' })
     return { error: 'Error inesperado al crear la cuenta' }
   }
 }
@@ -153,9 +158,8 @@ export async function completeOnboardingAction(
     return { error: 'Industria y nombre del negocio son requeridos' }
   }
 
-  const validIndustries = ['distributor', 'retail', 'grocery', 'service']
-  if (!validIndustries.includes(industry)) {
-    return { error: 'Industria no válida' }
+  if (!isValidIndustry(industry)) {
+    return { error: 'Industria no valida' }
   }
 
   try {
@@ -172,11 +176,14 @@ export async function completeOnboardingAction(
     }
 
     // Get default module configuration for the industry
-    const defaultConfig = getDefaultConfig(industry)
+    // industry is validated above with isValidIndustry()
+    const defaultConfig = getDefaultConfig(industry as IndustryType)
 
     // Use the complete_onboarding RPC function
     // This function has SECURITY DEFINER and bypasses RLS
     // It creates the business AND updates the user in a single transaction
+    // Note: Using 'as never' cast because Supabase RPC types are not generated yet
+    // TODO: Remove cast after running `npx supabase gen types typescript`
     const { data: businessId, error: rpcError } = await supabase.rpc(
       'complete_onboarding',
       {
@@ -185,11 +192,11 @@ export async function completeOnboardingAction(
         p_phone: phone || null,
         p_address: address || null,
         p_config: defaultConfig,
-      }
+      } as never
     )
 
     if (rpcError) {
-      console.error('Error in complete_onboarding:', rpcError)
+      log.error('Onboarding RPC failed', rpcError, { action: 'complete_onboarding' })
 
       // Handle specific errors
       if (rpcError.message.includes('already has a business')) {
@@ -216,49 +223,11 @@ export async function completeOnboardingAction(
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error
     }
-    console.error('Onboarding error:', error)
+    log.error('Onboarding failed', error, { action: 'onboarding' })
     return { error: 'Error inesperado al completar el onboarding' }
   }
 }
 
-function getDefaultConfig(industry: string) {
-  const configs = {
-    distributor: {
-      modules: {
-        stock: { enabled: true, variants: false, projections: true },
-        orders: { enabled: true, recurring: true, tiered_pricing: true },
-        deliveries: { enabled: true, type: 'own_routes' },
-        billing: { enabled: true, current_account: true, auto_reminders: true },
-      },
-    },
-    retail: {
-      modules: {
-        stock: { enabled: true, variants: true, projections: false },
-        orders: { enabled: true, recurring: false, tiered_pricing: false },
-        deliveries: { enabled: false },
-        billing: { enabled: true, current_account: true, auto_reminders: true },
-      },
-    },
-    grocery: {
-      modules: {
-        stock: { enabled: true, variants: false, projections: true },
-        orders: { enabled: false },
-        deliveries: { enabled: false },
-        billing: { enabled: true, current_account: true, auto_reminders: false },
-      },
-    },
-    service: {
-      modules: {
-        stock: { enabled: false },
-        orders: { enabled: true, recurring: false, tiered_pricing: false },
-        deliveries: { enabled: false },
-        billing: { enabled: true, current_account: true, auto_reminders: true },
-      },
-    },
-  }
-
-  return configs[industry as keyof typeof configs] || configs.distributor
-}
 
 export async function logoutAction() {
   const supabase = await createClient()

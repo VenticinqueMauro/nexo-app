@@ -27,20 +27,10 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logoutAction } from '@/actions/auth'
+import { getIndustryName } from '@/lib/industries'
+import type { UserWithBusiness, NavigationItem } from '@/types/app.types'
 
-type UserData = {
-  id: string
-  name: string
-  email: string
-  role: string
-  business: {
-    name: string
-    industry: string
-    config: any
-  }
-}
-
-const navigationItems = [
+const navigationItems: NavigationItem[] = [
   {
     title: 'Inicio',
     href: '/dashboard',
@@ -70,7 +60,7 @@ const navigationItems = [
     href: '/dashboard/deliveries',
     icon: Truck,
     badge: null,
-    condition: (config: any) => config?.modules?.deliveries?.enabled,
+    condition: (config) => config?.modules?.deliveries?.enabled ?? false,
   },
   {
     title: 'Cobros',
@@ -80,7 +70,7 @@ const navigationItems = [
   },
 ]
 
-export function DashboardSidebar({ user }: { user: UserData }) {
+export function DashboardSidebar({ user }: { user: UserWithBusiness }) {
   const pathname = usePathname()
   const businessConfig = user.business?.config
 
@@ -185,12 +175,3 @@ export function DashboardSidebar({ user }: { user: UserData }) {
   )
 }
 
-function getIndustryName(industry: string) {
-  const names = {
-    distributor: 'Distribuidora',
-    retail: 'Tienda / Retail',
-    grocery: 'Almacén',
-    service: 'Servicios',
-  }
-  return names[industry as keyof typeof names] || 'Negocio'
-}
