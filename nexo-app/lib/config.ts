@@ -4,6 +4,8 @@
  */
 
 import type { IndustryType, BusinessConfig } from '@/types/app.types'
+import type { SubscriptionConfig } from '@/types/modules.types'
+import { generateDefaultModulesConfig } from './modules'
 
 // =============================================================================
 // Validation Constants
@@ -41,49 +43,35 @@ export const VALID_INDUSTRIES: readonly IndustryType[] = [
 ] as const
 
 // =============================================================================
-// Default Module Configurations by Industry
+// Development Subscription (All features enabled)
 // =============================================================================
 
-export const DEFAULT_CONFIGS: Record<IndustryType, BusinessConfig> = {
-  distributor: {
-    modules: {
-      stock: { enabled: true, variants: false, projections: true },
-      orders: { enabled: true, recurring: true, tiered_pricing: true },
-      deliveries: { enabled: true, type: 'own_routes' },
-      billing: { enabled: true, current_account: true, auto_reminders: true },
-    },
-  },
-  retail: {
-    modules: {
-      stock: { enabled: true, variants: true, projections: false },
-      orders: { enabled: true, recurring: false, tiered_pricing: false },
-      deliveries: { enabled: false },
-      billing: { enabled: true, current_account: true, auto_reminders: true },
-    },
-  },
-  grocery: {
-    modules: {
-      stock: { enabled: true, variants: false, projections: true },
-      orders: { enabled: false },
-      deliveries: { enabled: false },
-      billing: { enabled: true, current_account: true, auto_reminders: false },
-    },
-  },
-  service: {
-    modules: {
-      stock: { enabled: false },
-      orders: { enabled: true, recurring: false, tiered_pricing: false },
-      deliveries: { enabled: false },
-      billing: { enabled: true, current_account: true, auto_reminders: true },
-    },
-  },
-} as const
+export const DEV_SUBSCRIPTION: SubscriptionConfig = {
+  plan: 'enterprise',
+  status: 'active',
+  bypassRestrictions: true,
+}
+
+// =============================================================================
+// Default Business Configurations by Industry
+// =============================================================================
 
 /**
  * Get the default configuration for an industry
+ * Uses the module system to generate appropriate defaults
  */
 export function getDefaultConfig(industry: IndustryType): BusinessConfig {
-  return DEFAULT_CONFIGS[industry] ?? DEFAULT_CONFIGS.distributor
+  return {
+    modules: generateDefaultModulesConfig(industry),
+    subscription: DEV_SUBSCRIPTION, // For development, all features enabled
+    contact: {},
+    preferences: {
+      currency: 'ARS',
+      timezone: 'America/Argentina/Buenos_Aires',
+      dateFormat: 'DD/MM/YYYY',
+      language: 'es',
+    },
+  }
 }
 
 /**
@@ -92,3 +80,20 @@ export function getDefaultConfig(industry: IndustryType): BusinessConfig {
 export function isValidIndustry(industry: string): industry is IndustryType {
   return VALID_INDUSTRIES.includes(industry as IndustryType)
 }
+
+// =============================================================================
+// Feature Flags (for gradual rollout)
+// =============================================================================
+
+export const FEATURES = {
+  // Enable/disable features globally during development
+  ENABLE_AI_FEATURES: false,         // AI-powered features (inventory prediction, etc.)
+  ENABLE_GOOGLE_PLACES: false,       // Google Places integration
+  ENABLE_ROUTE_OPTIMIZATION: false,  // Route optimization
+  ENABLE_MULTI_WAREHOUSE: false,     // Multi-warehouse support
+
+  // Always enabled
+  ENABLE_CURRENT_ACCOUNT: true,      // Cuenta corriente (fiado)
+  ENABLE_VARIANTS: true,             // Product variants
+  ENABLE_TIERED_PRICING: true,       // Tiered pricing
+} as const

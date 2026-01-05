@@ -57,6 +57,9 @@ Instrucciones para Claude Code al trabajar en este repositorio.
 2. **Consultar `nexo-app.md`** para decisiones de arquitectura
 3. **Mantener coherencia** con el código existente
 4. **NO sobre-diseñar** - solo lo que se pide
+5. **SIEMPRE usar el skill `frontend-design`** para diseño de UX/UI
+6. **Usar MCP de shadcn** cuando sea necesario para componentes
+7. **ELIMINAR deuda técnica** - no dejar TODOs, comentarios temporales, código duplicado, o problemas sin resolver
 
 ### Al Completar una Tarea
 
@@ -220,6 +223,48 @@ import { cn } from '@/lib/utils'
 
 ---
 
+## 🎨 Diseño de UX/UI
+
+### Skill Frontend Design
+
+**REGLA CRÍTICA**: Siempre que se trabaje en diseño de interfaces (páginas, componentes visuales, layouts), se **DEBE** usar el skill `frontend-design`.
+
+```bash
+# Invocar el skill para diseño
+/frontend-design
+```
+
+**Cuándo usar el skill:**
+- Crear nuevas páginas o vistas
+- Diseñar componentes visuales complejos
+- Implementar layouts y estructuras de UI
+- Mejorar o rediseñar interfaces existentes
+- Crear formularios y flujos de usuario
+
+**El skill ayuda con:**
+- Diseño distintivo y profesional (no genérico)
+- Código limpio y production-ready
+- Integración con shadcn/ui y Tailwind
+- Consistencia visual con el sistema de diseño
+- Componentes responsivos y accesibles
+
+### MCP de shadcn
+
+Usar el MCP de shadcn para:
+- Buscar componentes disponibles
+- Ver ejemplos de uso
+- Obtener comandos de instalación
+- Explorar variantes y patrones
+
+```typescript
+// Ejemplos de uso del MCP:
+// - Buscar componentes: mcp__shadcn__search_items_in_registries
+// - Ver ejemplos: mcp__shadcn__get_item_examples_from_registries
+// - Instalar: mcp__shadcn__get_add_command_for_items
+```
+
+---
+
 ## 🔐 Autenticación
 
 ### Flow de Auth
@@ -343,6 +388,15 @@ Esto verifica:
 5. **NO** ignorar RLS - siempre está activo
 6. **NO** usar `any` en TypeScript sin justificación
 7. **NO** hacer queries sin considerar multi-tenancy
+8. **NO** dejar deuda técnica:
+   - ❌ Comentarios `// TODO` o `// FIXME` sin resolver
+   - ❌ Código comentado sin eliminar
+   - ❌ `console.log()` de debugging (usar `logger`)
+   - ❌ Código duplicado sin refactorizar
+   - ❌ Imports no utilizados
+   - ❌ Variables/funciones no usadas
+   - ❌ Warnings de TypeScript sin resolver
+   - ❌ Errores de lint sin corregir
 
 ### ✅ SÍ Hacer
 
@@ -353,6 +407,14 @@ Esto verifica:
 5. **SÍ** consultar `nexo-app.md` para decisiones de arquitectura
 6. **SÍ** seguir los patrones existentes del código
 7. **SÍ** preguntar al usuario si hay ambigüedad
+8. **SÍ** usar el skill `frontend-design` para todo diseño de UX/UI
+9. **SÍ** eliminar deuda técnica antes de completar una tarea:
+   - ✅ Resolver todos los TODOs y FIXMEs
+   - ✅ Eliminar código comentado
+   - ✅ Remover console.logs (usar `logger`)
+   - ✅ Limpiar imports y variables no usadas
+   - ✅ Corregir warnings de TypeScript y lint
+   - ✅ Refactorizar código duplicado
 
 ---
 
@@ -402,4 +464,10 @@ Esto verifica:
 ---
 
 **Ultima actualizacion:** 5 de Enero 2026
-**Version:** 1.2.0
+**Version:** 1.3.0
+
+### Cambios en v1.3.0
+- ➕ Agregada sección "Diseño de UX/UI" con instrucciones para usar skill `frontend-design`
+- ➕ Agregada directiva obligatoria de usar MCP de shadcn cuando sea necesario
+- ➕ Agregadas reglas estrictas sobre eliminación de deuda técnica
+- ➕ Expandidas reglas en "Durante el Desarrollo" con énfasis en calidad de código

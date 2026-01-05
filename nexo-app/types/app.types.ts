@@ -4,6 +4,10 @@
  */
 
 import type { LucideIcon } from 'lucide-react'
+import type { ModulesConfig, SubscriptionConfig } from './modules.types'
+
+// Re-export module types for convenience
+export type { ModulesConfig, SubscriptionConfig } from './modules.types'
 
 // =============================================================================
 // Industry Types
@@ -22,47 +26,35 @@ export type IndustryInfo = {
 }
 
 // =============================================================================
-// Module Configuration Types
+// Contact Configuration
 // =============================================================================
-
-export type StockModuleConfig = {
-  enabled: boolean
-  variants?: boolean
-  projections?: boolean
-}
-
-export type OrdersModuleConfig = {
-  enabled: boolean
-  recurring?: boolean
-  tiered_pricing?: boolean
-}
-
-export type DeliveriesModuleConfig = {
-  enabled: boolean
-  type?: 'own_routes' | 'third_party'
-}
-
-export type BillingModuleConfig = {
-  enabled: boolean
-  current_account?: boolean
-  auto_reminders?: boolean
-}
-
-export type ModulesConfig = {
-  stock?: StockModuleConfig
-  orders?: OrdersModuleConfig
-  deliveries?: DeliveriesModuleConfig
-  billing?: BillingModuleConfig
-}
 
 export type ContactConfig = {
   phone?: string | null
   address?: string | null
+  email?: string | null
+  website?: string | null
 }
 
+// =============================================================================
+// Business Configuration
+// =============================================================================
+
+/**
+ * Complete business configuration stored in JSONB
+ */
 export type BusinessConfig = {
   modules?: ModulesConfig
+  subscription?: SubscriptionConfig
   contact?: ContactConfig
+
+  // Preferences
+  preferences?: {
+    currency?: string           // 'ARS', 'USD', etc.
+    timezone?: string           // 'America/Argentina/Buenos_Aires'
+    dateFormat?: string         // 'DD/MM/YYYY'
+    language?: string           // 'es', 'en'
+  }
 }
 
 // =============================================================================
@@ -107,7 +99,7 @@ export type NavigationItem = {
   href: string
   icon: LucideIcon
   badge: string | number | null
-  condition?: (config: BusinessConfig | undefined) => boolean
+  moduleId?: string             // Module this nav item belongs to
 }
 
 export type MetricTrend = {

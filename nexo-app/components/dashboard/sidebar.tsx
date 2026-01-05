@@ -20,66 +20,73 @@ import {
   Users,
   ShoppingCart,
   Truck,
-  DollarSign,
+  CreditCard,
   Settings,
   Zap,
   LogOut,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { logoutAction } from '@/actions/auth'
 import { getIndustryName } from '@/lib/industries'
+import { isModuleEnabled } from '@/lib/modules'
 import type { UserWithBusiness, NavigationItem } from '@/types/app.types'
+import type { ModuleId } from '@/types/modules.types'
 
-const navigationItems: NavigationItem[] = [
+/**
+ * Navigation items configuration
+ * Each item optionally has a moduleId that determines visibility
+ */
+const navigationItems: (NavigationItem & { moduleId?: ModuleId })[] = [
   {
     title: 'Inicio',
     href: '/dashboard',
     icon: LayoutDashboard,
     badge: null,
+    moduleId: 'dashboard',
   },
   {
     title: 'Productos',
     href: '/dashboard/products',
     icon: Package,
     badge: null,
+    moduleId: 'products',
   },
   {
     title: 'Clientes',
     href: '/dashboard/customers',
     icon: Users,
     badge: null,
+    moduleId: 'customers',
   },
   {
     title: 'Pedidos',
     href: '/dashboard/orders',
     icon: ShoppingCart,
     badge: null,
+    moduleId: 'orders',
   },
   {
     title: 'Entregas',
     href: '/dashboard/deliveries',
     icon: Truck,
     badge: null,
-    condition: (config) => config?.modules?.deliveries?.enabled ?? false,
+    moduleId: 'deliveries',
   },
   {
     title: 'Cobros',
     href: '/dashboard/billing',
-    icon: DollarSign,
+    icon: CreditCard,
     badge: null,
+    moduleId: 'payments',
   },
 ]
 
 export function DashboardSidebar({ user }: { user: UserWithBusiness }) {
   const pathname = usePathname()
-  const businessConfig = user.business?.config
 
-  // Filter navigation items based on business config
+  // Filter navigation items based on enabled modules
   const filteredNavigation = navigationItems.filter((item) => {
-    if (item.condition) {
-      return item.condition(businessConfig)
-    }
-    return true
+    if (!item.moduleId) return true
+    return isModuleEnabled(user.business, item.moduleId)
   })
 
   return (
@@ -174,4 +181,3 @@ export function DashboardSidebar({ user }: { user: UserWithBusiness }) {
     </Sidebar>
   )
 }
-
