@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
 import { ModuleCard } from '@/components/settings/module-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,16 +16,10 @@ import {
   Info,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { ModuleTier, ModuleMetadata } from '@/types/modules.types'
+import type { ModuleTier } from '@/types/modules.types'
 import type { IndustryType } from '@/types/app.types'
 import { getIndustryName } from '@/lib/industries'
-
-type ModuleWithEnabled = ModuleMetadata & { enabled: boolean }
-
-type ModuleGroup = {
-  tier: ModuleTier
-  modules: ModuleWithEnabled[]
-}
+import type { ModuleGroup } from './page'
 
 type ModulesPageClientProps = {
   modulesByTier: ModuleGroup[]

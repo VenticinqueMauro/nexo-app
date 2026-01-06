@@ -62,18 +62,21 @@ export type ModuleId =
   | 'stock'
   | 'orders'
   | 'payments'
+  | 'chat'              // Chat interno en la app
   // Pro tier
   | 'deliveries'
   | 'variants'
   | 'tiered_pricing'
   | 'reports'
   | 'recurring_orders'
+  | 'telegram_bot'      // Bot de Telegram
   // Business tier
   | 'route_optimization'
   | 'google_places'
   | 'inventory_ai'
   | 'multi_warehouse'
   | 'advanced_analytics'
+  | 'voice_input'       // Entrada por voz
   // Enterprise tier
   | 'api_access'
   | 'white_label'
@@ -85,7 +88,7 @@ export type ModuleId =
 // =============================================================================
 
 /**
- * Complete metadata for a module
+ * Complete metadata for a module (includes icon component)
  */
 export type ModuleMetadata = {
   id: ModuleId
@@ -107,6 +110,12 @@ export type ModuleMetadata = {
   comingSoon?: boolean           // Show as "coming soon" in UI
   badge?: string                 // Badge to show (e.g., "NEW", "BETA")
 }
+
+/**
+ * Serializable version of ModuleMetadata (without icon component)
+ * Use this when passing module data from Server to Client Components
+ */
+export type SerializableModuleMetadata = Omit<ModuleMetadata, 'icon'>
 
 // =============================================================================
 // Module Configuration (stored in business.config.modules)
@@ -264,6 +273,35 @@ export type AuditLogModuleConfig = BaseModuleConfig & {
   logLevel?: 'basic' | 'detailed' | 'verbose'
 }
 
+/**
+ * Chat module configuration
+ */
+export type ChatModuleConfig = BaseModuleConfig & {
+  showSuggestions?: boolean        // Mostrar sugerencias de acciones
+  enableHistory?: boolean          // Guardar historial de conversaciones
+  maxHistoryDays?: number          // Días de historial a mantener
+}
+
+/**
+ * Telegram Bot module configuration
+ */
+export type TelegramBotModuleConfig = BaseModuleConfig & {
+  botToken?: string                // Token del bot (almacenado de forma segura)
+  allowCustomerBot?: boolean       // Permitir bot para clientes
+  notifyOnOrders?: boolean         // Notificar nuevos pedidos
+  notifyOnPayments?: boolean       // Notificar pagos recibidos
+  notifyOnLowStock?: boolean       // Notificar stock bajo
+}
+
+/**
+ * Voice Input module configuration
+ */
+export type VoiceInputModuleConfig = BaseModuleConfig & {
+  provider?: 'whisper' | 'google' | 'azure'
+  language?: string                // Idioma principal (es-AR, es-MX, etc.)
+  autoSend?: boolean               // Enviar automáticamente al terminar de hablar
+}
+
 // =============================================================================
 // Combined Modules Configuration
 // =============================================================================
@@ -277,6 +315,7 @@ export type ModulesConfig = {
   stock?: StockModuleConfig
   orders?: OrdersModuleConfig
   payments?: PaymentsModuleConfig
+  chat?: ChatModuleConfig
 
   // Pro tier
   deliveries?: DeliveriesModuleConfig
@@ -284,6 +323,7 @@ export type ModulesConfig = {
   tiered_pricing?: TieredPricingModuleConfig
   reports?: ReportsModuleConfig
   recurring_orders?: RecurringOrdersModuleConfig
+  telegram_bot?: TelegramBotModuleConfig
 
   // Business tier
   route_optimization?: RouteOptimizationModuleConfig
@@ -291,6 +331,7 @@ export type ModulesConfig = {
   inventory_ai?: InventoryAIModuleConfig
   multi_warehouse?: MultiWarehouseModuleConfig
   advanced_analytics?: AdvancedAnalyticsModuleConfig
+  voice_input?: VoiceInputModuleConfig
 
   // Enterprise tier
   api_access?: ApiAccessModuleConfig

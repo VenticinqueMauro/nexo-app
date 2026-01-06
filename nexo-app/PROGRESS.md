@@ -315,9 +315,9 @@
 | Tier | Modulos |
 |------|---------|
 | **CORE** | dashboard, products, customers, settings |
-| **FREE** | stock, orders, payments |
-| **PRO** | deliveries, variants, tiered_pricing, reports, recurring_orders |
-| **BUSINESS** | route_optimization, google_places, inventory_ai, multi_warehouse, advanced_analytics |
+| **FREE** | stock, orders, payments, chat |
+| **PRO** | deliveries, variants, tiered_pricing, reports, recurring_orders, telegram_bot |
+| **BUSINESS** | route_optimization, google_places, inventory_ai, multi_warehouse, advanced_analytics, voice_input |
 | **ENTERPRISE** | api_access, white_label, team_management, audit_log |
 
 #### 3. Hooks de Modulos
@@ -402,6 +402,39 @@
 - ✅ **Animaciones** - Entrada escalonada de tarjetas
 - ✅ **Visual hierarchy** - Modulos CORE siempre visibles como "Siempre activo"
 - ✅ **Dependencies** - Muestra "Requiere: X" cuando hay dependencias
+
+---
+
+## 📅 Sesion 7 - 6 de Enero 2026
+
+### ✅ Completado
+
+#### 1. Correccion de Error de Serializacion Server-to-Client
+
+- ✅ **Problema**: Error "Only plain objects can be passed to Client Components from Server Components" al pasar iconos de Lucide
+- ✅ **Causa**: Los iconos de Lucide son componentes React (tienen metodos), no se pueden serializar
+- ✅ **Solucion**:
+  - Creado `lib/module-icons.ts` - Mapa de iconos por ModuleId para uso cliente
+  - Agregado tipo `SerializableModuleMetadata` en `types/modules.types.ts` (sin propiedad `icon`)
+  - Actualizado `page.tsx` para no incluir `icon` en datos serializados
+  - Actualizado `module-card.tsx` para obtener icono de `MODULE_ICONS[module.id]`
+
+#### 2. Modulos de Canales del Agente Conversacional
+
+- ✅ **Nuevos modulos agregados**:
+
+| Modulo | Tier | Descripcion | Dependencias |
+|--------|------|-------------|--------------|
+| `chat` | FREE | Chat con Nexo dentro de la app | - |
+| `telegram_bot` | PRO | Bot de Telegram para interactuar con Nexo | `chat` |
+| `voice_input` | BUSINESS | Entrada por voz (speech-to-text) | `chat` |
+
+- ✅ **Configuraciones especificas por modulo**:
+  - `ChatModuleConfig`: showSuggestions, enableHistory, maxHistoryDays
+  - `TelegramBotModuleConfig`: botToken, allowCustomerBot, notifyOnOrders, notifyOnPayments, notifyOnLowStock
+  - `VoiceInputModuleConfig`: provider (whisper/google/azure), language, autoSend
+
+- ✅ **Iconos**: MessageCircle (chat), Send (telegram), Mic (voice)
 
 ---
 
@@ -674,6 +707,6 @@ Ninguno.
 
 ---
 
-**Ultima actualizacion:** 5 de Enero 2026 (Sesion 6)
-**Version del proyecto:** 0.5.0
-**Estado:** UI de gestion de modulos completa - Listo para CRUD de productos
+**Ultima actualizacion:** 6 de Enero 2026 (Sesion 7)
+**Version del proyecto:** 0.6.0
+**Estado:** Modulos de agente conversacional agregados - Listo para CRUD de productos

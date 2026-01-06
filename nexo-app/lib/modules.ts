@@ -25,6 +25,9 @@ import {
   Paintbrush,
   UserCog,
   FileText,
+  MessageCircle,
+  Send,
+  Mic,
 } from 'lucide-react'
 
 import type {
@@ -128,6 +131,17 @@ export const MODULES: Record<ModuleId, ModuleMetadata> = {
     defaultEnabled: 'all',
     canDisable: true,
   },
+  chat: {
+    id: 'chat',
+    name: 'Chat con Nexo',
+    description: 'Asistente conversacional dentro de la app',
+    tier: 'free',
+    category: 'ai',
+    icon: MessageCircle,
+    defaultEnabled: 'all',
+    canDisable: true,
+    requiredBy: ['telegram_bot', 'voice_input'],
+  },
 
   // ---------------------------------------------------------------------------
   // PRO TIER MODULES
@@ -185,6 +199,17 @@ export const MODULES: Record<ModuleId, ModuleMetadata> = {
     defaultEnabled: ['distributor'],
     canDisable: true,
     dependencies: ['orders'],
+  },
+  telegram_bot: {
+    id: 'telegram_bot',
+    name: 'Bot de Telegram',
+    description: 'Interactúa con Nexo desde Telegram',
+    tier: 'pro',
+    category: 'integration',
+    icon: Send,
+    defaultEnabled: 'none',
+    canDisable: true,
+    dependencies: ['chat'],
   },
 
   // ---------------------------------------------------------------------------
@@ -244,6 +269,18 @@ export const MODULES: Record<ModuleId, ModuleMetadata> = {
     icon: LineChart,
     defaultEnabled: 'none',
     canDisable: true,
+  },
+  voice_input: {
+    id: 'voice_input',
+    name: 'Entrada por Voz',
+    description: 'Habla con Nexo usando tu voz',
+    tier: 'business',
+    category: 'ai',
+    icon: Mic,
+    defaultEnabled: 'none',
+    canDisable: true,
+    dependencies: ['chat'],
+    badge: 'IA',
   },
 
   // ---------------------------------------------------------------------------
@@ -542,6 +579,14 @@ export function generateDefaultModulesConfig(industry: IndustryType): ModulesCon
             enabled: true,
             maxTemplatesPerCustomer: 5,
             allowAutoConfirm: false,
+          }
+          break
+        case 'chat':
+          config.chat = {
+            enabled: true,
+            showSuggestions: true,
+            enableHistory: true,
+            maxHistoryDays: 30,
           }
           break
         default:

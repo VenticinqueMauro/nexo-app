@@ -2,8 +2,15 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ModulesPageClient } from './modules-client'
 import type { Business } from '@/types/app.types'
-import type { ModuleTier } from '@/types/modules.types'
+import type { ModuleTier, SerializableModuleMetadata } from '@/types/modules.types'
 import { getModulesByTier, isModuleEnabled } from '@/lib/modules'
+
+export type ModuleWithEnabled = SerializableModuleMetadata & { enabled: boolean }
+
+export type ModuleGroup = {
+  tier: ModuleTier
+  modules: ModuleWithEnabled[]
+}
 
 export default async function ModulesPage() {
   const supabase = await createClient()
@@ -27,9 +34,10 @@ export default async function ModulesPage() {
   const business = userData.business
 
   // Get modules grouped by tier with enabled status
+  // Note: We exclude 'icon' because React components can't be serialized for Client Components
   const tiers: ModuleTier[] = ['core', 'free', 'pro', 'business', 'enterprise']
 
-  const modulesByTier = tiers.map(tier => ({
+  const modulesByTier: ModuleGroup[] = tiers.map(tier => ({
     tier,
     modules: getModulesByTier(tier).map(module => ({
       id: module.id,
@@ -37,7 +45,6 @@ export default async function ModulesPage() {
       description: module.description,
       tier: module.tier,
       category: module.category,
-      icon: module.icon,
       defaultEnabled: module.defaultEnabled,
       canDisable: module.canDisable,
       dependencies: module.dependencies,

@@ -7,11 +7,12 @@ import { cn } from '@/lib/utils'
 import { toggleModuleAction } from '@/actions/modules'
 import { toast } from 'sonner'
 import { Lock, Sparkles, Link2 } from 'lucide-react'
-import type { ModuleMetadata, ModuleTier } from '@/types/modules.types'
+import type { SerializableModuleMetadata, ModuleTier } from '@/types/modules.types'
 import { MODULES } from '@/lib/modules'
+import { MODULE_ICONS } from '@/lib/module-icons'
 
 type ModuleCardProps = {
-  module: ModuleMetadata
+  module: SerializableModuleMetadata
   enabled: boolean
   onToggle?: (enabled: boolean) => void
 }
@@ -27,7 +28,7 @@ const tierConfig: Record<ModuleTier, { label: string; color: string; bgColor: st
 export function ModuleCard({ module, enabled, onToggle }: ModuleCardProps) {
   const [isPending, startTransition] = useTransition()
   const [optimisticEnabled, setOptimisticEnabled] = useState(enabled)
-  const Icon = module.icon
+  const Icon = MODULE_ICONS[module.id]
   const tier = tierConfig[module.tier]
   const isCore = module.tier === 'core'
   const isPremium = ['pro', 'business', 'enterprise'].includes(module.tier)
